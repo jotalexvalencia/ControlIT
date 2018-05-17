@@ -1,0 +1,400 @@
+﻿<html>
+<head>
+    <title>Propietarios Old</title>
+    <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"
+            integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+            crossorigin="anonymous"></script>
+
+    <script>
+
+        //Clean the textbox when submit
+        function cleartextboxes() {
+            $("input:text").val("");
+        }
+
+        $(document).ready(function () {
+            getPropietarioList();
+            $('.gmaps').gmaps();
+
+        });
+
+        var Propietario = {
+            id: 0,
+            nombre: "",
+            apellido: ""
+        }
+
+        var Vehiculo = {
+            id: 0,
+            descripcion: "",
+            longitud: "",
+            latitud: "",
+            propietario: "",
+            sitio: ""
+        }
+        var i = 0;
+        var marcadores=[]; 
+
+        // Get all Propietarios to display
+        function getPropietarioList() {
+            // Call Web API to get a list of Propietarios
+            $.ajax({
+                url: '/api/Propietario/',
+                type: 'GET',
+                dataType: 'json',
+                success: function (Propietarios) {
+                    PropietarioListSuccess(Propietarios);
+
+                },
+                error: function (request, message, error) {
+                    handleException(request, message, error);
+                }
+            });
+        }
+
+        // Display all Propietarios returned from Web API call
+        function PropietarioListSuccess(Propietarios) {
+            // Iterate over the collection of data
+            $("#PropietarioTable tbody").remove();
+            $.each(Propietarios, function (index, Propietario) {
+                // Add a row to the Propietario table
+                PropietarioAddRow(Propietario);
+            });
+        }
+
+        // Add Propietario row to <table>
+        function PropietarioAddRow(Propietario) {
+            // First check if a <tbody> tag exists, add one if not
+            if ($("#PropietarioTable tbody").length == 0) {
+                $("#PropietarioTable").append("<tbody></tbody>");
+            }
+
+            // Append row to <table>
+            $("#PropietarioTable tbody").append(
+                PropietarioBuildTableRow(Propietario));
+        }
+
+        // Build a <tr> for a row of table data
+        function PropietarioBuildTableRow(Propietario) {
+            var newRow = "<tr class='success'>" +
+                "<td><input   class='input-nombre input-sm' type='text' value='" + Propietario.nombre + "'/></td>" +
+                "<td><input  class='input-apellido input-sm'  type='text' value='" + Propietario.apellido + "'/></td>" +
+                "<td>" +
+                "<button type='button' " +
+                "onclick='CleanRows();getVehiculo(this);initialize();'" +
+                "class='btn btn-primary btn-xs' " +
+                "data-id='" + Propietario.id + "' " +
+                ">" +
+                "<span class='glyphicon glyphicon-search' />Show Vehicles" +
+                "</button> " +
+                "<button type='button' " +
+                "onclick='PropietarioUpdate(this);'" +
+                "class='btn btn-primary btn-xs' " +
+                "data-id='" + Propietario.id + "' " +
+                "data-nombre='" + Propietario.nombre + "' " +
+                "data-apellido='" + Propietario.apellido + "' " +
+                ">" +
+                "<span class='glyphicon glyphicon-edit' /> Update" +
+                "</button> " +
+                " <button type='button' " +
+                //"onclick='javascript:return asegurar(PropietarioDelete(this));'" +
+                "onclick='PropietarioDelete(this);'" +
+                "class='btn btn-primary btn-xs' " +
+                "data-id='" + Propietario.id + "'>" +
+                "<span class='glyphicon glyphicon-remove' />Delete" +
+                "</button>" +
+                "</td>" +
+                "</tr>";
+
+            return newRow;
+        }
+
+
+
+        function onAddPropietario(item) {
+            var options = {};
+            options.url = "/api/Propietario";
+            options.type = "POST";
+            var obj = Propietario;
+            obj.nombre = $("#nombre").val();
+            obj.apellido = $("#apellido").val();
+            console.dir(obj);
+            options.data = JSON.stringify(obj);
+            options.contentType = "application/json";
+            options.dataType = "html";
+
+            options.success = function (msg) {
+                getPropietarioList();
+                $("#msg").html(msg);
+                if (obj.nombre == '' || obj.apellido == '') {
+                    alert("ingrese su nombre completo");
+                }
+                else {
+                    alert("propietario creado con éxito");
+                }
+            },
+                options.error = function () {
+                    $("#msg").html("Error while calling the Web API!");
+                };
+
+
+            $.ajax(options);
+        }
+
+
+        function PropietarioUpdate(item) {
+            var id = $(item).data("id");
+            var options = {};
+            //options.url = "/api/Propietario/" + $(item).data("id");
+            options.url = "/api/Propietario/"
+                + id;
+            options.type = "PUT";
+
+            var obj = Propietario;
+            obj.id = $(item).data("id");
+            obj.nombre = $(".input-nombre", $(item).parent().parent()).val();
+            obj.apellido = $(".input-apellido", $(item).parent().parent()).val();
+            console.dir(obj);
+            options.data = JSON.stringify(obj);
+            options.contentType = "application/json";
+            options.dataType = "html";
+            options.success = function (msg) {
+                $("#msg").html(msg);
+                alert(msg);
+            };
+            options.error = function () {
+                $("#msg").html("Error while calling the Web API!");
+            };
+            $.ajax(options);
+        }
+
+        function PropietarioDelete(item) {
+            var confirma = asegurar();
+           
+                var id = $(item).data("id");
+                var options = {};
+                if (confirma == true) {
+                options.url = "/api/Propietario/"
+                    + id;
+                options.type = "DELETE";
+                options.dataType = "html";
+
+
+                options.success = function (msg) {
+
+                    console.log('msg= ' + msg);
+                    $("#msg").html(msg);
+
+                    alert(msg);
+                    getPropietarioList();
+
+                };
+            } 
+
+
+            options.error = function () {
+                $("#msg").html("Error while calling the Web API!");
+            };
+            $.ajax(options);
+
+        }
+
+        function asegurar() {
+            rc = confirm("¿Seguro que desea Eliminar?");
+            return rc;
+        }
+
+        // Get all PropVehiculos to display
+        function getVehiculo(item) {
+
+            var id = $(item).data("id");
+            $.ajax({
+                url: '/api/Vehiculo/' + id,
+                type: 'GET',
+                dataType: 'json',
+                success: function (Vehiculo) {
+
+                    VehiculoListSuccess(Vehiculo);
+                   
+                    
+                },
+                error: function (request, message, error) {
+                    handleException(request, message, error);
+                }
+            });
+
+        }
+
+        // Display all Vehiculos returned from Web API call
+        function VehiculoListSuccess(Vehiculo) {
+            // Iterate over the collection of data
+            $("#VehiculosTable tbody").remove();
+            $.each(Vehiculo, function (index, Vehiculo) {
+                // Add a row to the Propietario table
+                VehiculoAddRow(Vehiculo);
+               
+            });
+        }
+
+        // Add Vehiculo row to <table>
+        function VehiculoAddRow(Vehiculo) {
+            // First check if a <tbody> tag exists, add one if not
+            if ($("#VehiculoTable tbody").length == 0) {
+                $("#VehiculoTable").append("<tbody></tbody>");
+
+            }
+
+            // Append row to <table>
+            $("#VehiculoTable tbody").append(
+                VehiculoBuildTableRow(Vehiculo));
+        }
+
+        // Build a <tr> for a row of table data
+        function VehiculoBuildTableRow(Vehiculo) {
+            
+            var j = 0;
+
+            while (j < 3) {
+                marcadores.push([Vehiculo.sitio, Vehiculo.latitud, Vehiculo.longitud]);
+                j++;
+            }
+           
+            var newRow = "<tr class='success'>" +
+                "<td><input   class='input-latitud input-sm' type='text' value='" + Vehiculo.latitud + "' readonly/></td>" +
+                "<td><input  class='input-longitud input-sm'  type='text' value='" + Vehiculo.longitud + "' readonly/></td>" +
+                "<td><input  class='input-sitio input-sm'  type='text' value='" + Vehiculo.sitio + "' readonly/></td>" +               
+                "</tr>";           
+            return newRow; 
+
+           
+        }
+
+        function CleanRows() {
+
+            $('#VehiculoTable tbody tr').remove();
+
+        }
+
+        // Handle exceptions from AJAX calls
+        function handleException(request, message, error) {
+            var msg = "";
+            msg += "Code: " + request.status + "\n";
+            msg += "Text: " + request.statusText + "\n";
+            if (request.responseJSON != null) {
+                msg += "Message" + request.responseJSON.Message + "\n";
+            }
+
+            alert(msg);
+        }
+
+
+
+    </script>
+    <script src="http://code.jquery.com/jquery-3.2.1.js"></script>
+    <link href="~/css/jquery.gmaps.css" rel="stylesheet" />
+    <script src="~/js/jquery.gmaps.js"></script>
+</head>
+
+<body>
+    <h3>Propietarios Manager</h3>
+    <a href="http://localhost:58593/Views/Home/Vehiculosold.cshtml">Ir a Administración Vehiculos</a>
+    <form id="form-id">
+        <div class="container">
+            <div class="table-responsive">
+                <table id="PropietarioTable" class="table table-condensed">
+                    <thead>
+                        <tr>
+
+                            <td> Nombre </td>
+                            <td> Apellido </td>
+                            <td> </td>
+                        </tr>
+                        <tr>
+                            <td class="btn-xs">
+                                <input id="nombre" type="text" class="form-control input-sm" required />
+                            </td>
+
+                            <td class="btn-xs">
+                                <input id="apellido" type="text" class="form-control input-sm" required />
+                            </td>
+                            <td>
+                                <input type="button" id="insert" value="Insert" onclick='onAddPropietario(this) ,cleartextboxes();' class="btn btn-primary btn-xs" />
+
+                            </td>
+                    </thead>
+                </table>
+                <div>
+                    @*esta es la nueva tabla*@
+                    <table id="VehiculoTable" class="table table-responsive table-bordered" cellspacing="0" cellpadding="0">
+                        <thead>
+                            <tr class="primerFila">
+
+
+                                <td class="col-xs-2"> Latitud </td>
+                                <td class="col-xs-2"> Longitud  </td>
+                                <td class="col-xs-2"> Sitio </td>
+
+                            </tr>
+
+                        </thead>
+                    </table>
+                    @*fin nueva tabla*@
+                </div>
+            </div>
+        </div>
+        <br />
+        @*<div id="msg"></div>*@
+
+    </form>
+    <div id="map" style="width:1250px;height:500px" ></div>
+
+        <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+        <script type="text/javascript">
+            function initialize() {
+               
+                var map = new google.maps.Map(document.getElementById('map'), {
+                    zoom: 7,
+                    center: new google.maps.LatLng(4.570868, -74.29733299999998),
+                    mapTypeId: google.maps.MapTypeId.ROADMAP
+                    
+                });
+                
+                var infowindow = new google.maps.InfoWindow();
+                var marker, i;
+                for (i = 0; i < marcadores.length; i++) {
+                    marker = new google.maps.Marker({
+                       
+                        position: new google.maps.LatLng(marcadores[i][1], marcadores[i][2]),
+                        animation: google.maps.Animation.BOUNCE,                        
+                        map: map
+                    });
+                    
+                    google.maps.event.addListener(marker, 'click', (function (marker, i) {
+                        return function () {                           
+                            infowindow.setContent(marcadores[i][0]);
+                            infowindow.open(map, marker);
+                            
+                        }
+                    })(marker, i));
+                    
+                }
+                marcadores = [];
+            }
+            google.maps.event.addDomListener(window, 'load', initialize);
+        </script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyB6wZHAHkw38ZYBv9i_eZIleaMNQKB4WnM&callback=myMap"></script>
+    <!--
+    To use this code on your website, get a free API key from Google.
+    Read more at: https://www.w3schools.com/graphics/google_maps_basic.asp
+    -->
+    <style>
+
+        .gmaps {
+            height: 500px;
+            width: 100%;
+        }
+    </style>
+</body>
+</html>
