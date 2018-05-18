@@ -147,8 +147,10 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
+    <Compile Include="Controllers\IVehicle.cs" />
     <Compile Include="Controllers\PropietarioController.cs" />
     <Compile Include="Controllers\VehiculoController.cs" />
+    <Compile Include="Controllers\VehiculoMock.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

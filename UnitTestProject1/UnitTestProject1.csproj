@@ -67,6 +67,7 @@
     <Compile Include="TestSimplePropietarioController.cs" />
     <Compile Include="UnitTest1.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="VehiculoMockTest.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
