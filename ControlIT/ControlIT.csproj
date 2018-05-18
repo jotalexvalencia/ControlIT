@@ -151,6 +151,7 @@
     <Compile Include="Controllers\PropietarioController.cs" />
     <Compile Include="Controllers\VehiculoController.cs" />
     <Compile Include="Controllers\VehiculoMock.cs" />
+    <Compile Include="Controllers\VehiculoSQL.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>

@@ -7,13 +7,15 @@ using System.Linq;
 namespace UnitTestProject1
 {
     [TestClass]
-    public class VehiculoMockTest
+    public class VehiculoMockTest 
     {
         [TestMethod]
         public void GetTodos()
         {
-            // Arrange           
+            // Arrange   
+            
             VehiculoMock controller = new VehiculoMock();
+        
 
             // Act
             var result = controller.GetCantVehiculos();

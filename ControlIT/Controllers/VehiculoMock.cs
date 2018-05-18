@@ -1,16 +1,13 @@
 ﻿using ControlIT.Models;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.Http;
+using System.Configuration;
+using System.Data.SqlClient;
 
 namespace ControlIT.Controllers
 {
     public class VehiculoMock : IVehicle
     {
         public List<CantidadVehiculos> cantidadVehiculos;
-
 
         public VehiculoMock()
         {
@@ -35,12 +32,24 @@ namespace ControlIT.Controllers
             cantidadVehiculo2.pid = 1046;
             cantidadVehiculo2.sitio = "PEREIRA";
             cantidadVehiculos.Add(cantidadVehiculo2);
-           
+
+            
+
         }
 
         public List<CantidadVehiculos> GetCantVehiculos()
         {
             return cantidadVehiculos;
+        }
+
+        List<CantidadVehiculos> IVehicle.GetCantVehiculos()
+        {
+            throw new System.NotImplementedException();
+        }
+
+        public void setConexion(string constr)
+        {
+            
         }
     }
 }
