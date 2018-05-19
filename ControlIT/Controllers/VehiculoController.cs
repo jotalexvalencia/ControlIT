@@ -15,6 +15,7 @@ namespace ControlIT.Controllers
     {
         private SqlConnection conn;
         private SqlCommand com;
+        string constr;
 
         private void connection()
         {
@@ -22,10 +23,16 @@ namespace ControlIT.Controllers
             conn = new SqlConnection(constr);
         }
 
+        //VehiculoSQL vehiculoSQL;//nuevo
+
+
+
         //POST: /api/Vehiculo
         [System.Web.Http.HttpPost]
         public HttpResponseMessage PostVehiculo([FromBody]Vehiculo item)
         {
+            //vehiculoSQL.setConexion(constr);
+            //conn = new SqlConnection(constr);
             HttpResponseMessage respuesta = null;
 
             if (item.descripcion != string.Empty && item.longitud != 0 && item.latitud != 0
@@ -99,6 +106,10 @@ namespace ControlIT.Controllers
             connection();
             conn.Open();
 
+            //vehiculoSQL.setConexion(constr);
+            //conn = new SqlConnection(constr);
+            //conn.Open();
+
             List<CantidadVehiculos> cantidadVehiculos = new List<CantidadVehiculos>();
 
             com = new SqlCommand("SELECT propietario.nombre as nombre,propietario.apellido as apellido," +
@@ -153,6 +164,9 @@ namespace ControlIT.Controllers
                 int cantVehiculos;
 
                 connection();
+                //vehiculoSQL.setConexion(constr);
+                //conn = new SqlConnection(constr);
+                //conn.Open();
 
                 conn.Open();
                 string sqlText = $"SELECT COUNT (vehiculos.propietario) as cantidad  FROM vehiculos " +
@@ -224,6 +238,9 @@ namespace ControlIT.Controllers
             {
 
                 connection();
+
+                //vehiculoSQL.setConexion(constr);
+                //conn = new SqlConnection(constr);
                 conn.Open();
 
                 var vehiculos = new List<Vehiculo>();
