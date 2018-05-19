@@ -31,7 +31,7 @@ namespace UnitTestProject1
                     maximo= int.Parse(registros[0].ToString());
                    
                 }
-            int id = sql.InsProp("Abi", "Armijo");
+            int id = sql.InsProp("Pablo", "B");
 
             //tu assert
              Assert.AreEqual(maximo + 1, id);

@@ -11,10 +11,24 @@ using System.Web.Http.Cors;
 namespace ControlIT.Controllers
 {
     [EnableCors(origins: "*", headers: "*", methods: "*")]
-    public class PropietarioController : ApiController
+    public class PropietariosController : ApiController
     {
         private SqlConnection conn;
         private SqlCommand com;
+
+        private Repositorio repo;
+
+        public PropietariosController()
+        {
+            var constr = ConfigurationManager.ConnectionStrings["ad"];
+            if (constr != null)
+            {
+                repo = new Repositorio(constr.ConnectionString);
+            }
+        }
+
+        //seam
+        internal Repositorio Repositorio { set { repo = value; } }
 
         private void connection()        {
             
@@ -22,62 +36,26 @@ namespace ControlIT.Controllers
             conn = new SqlConnection(constr);
         }
 
-        //GET: api/Propietario
-        [System.Web.Http.HttpGet()]
-        public IHttpActionResult GetPropietario()
+        //GET: api/Propietarios
+        public IHttpActionResult Get()
         {
-            IHttpActionResult ret = null;
-
-            connection();
-            conn.Open();
-
-            var propietarios = new List<Propietario>();
-            com = new SqlCommand("SELECT * FROM propietario", conn);
-            using (var registro = com.ExecuteReader())
-            {
-
-                while (registro.Read())
-                {
-                    // Usuario
-                    var propietario = new Propietario
-                    {
-                        id = Convert.ToInt32(registro["id"]),
-                        nombre = registro["nombre"].ToString(),
-                        apellido = registro["apellido"].ToString()
-                    };
-
-                    // Agregamos el usuario a la lista 
-                    propietarios.Add(propietario);
-                }
-
-                if (propietarios.Count > 0)
-                {
-                    conn.Close();
-                    ret = Ok(propietarios);
-                }
-                else
-                {
-                    conn.Close();
-                    ret = NotFound();
-                }
-
-                return ret;
-            }
+            var propietarios = repo.ObtenerPropietarios();
+            return Ok(propietarios);
         }
 
         //POST: /api/Propietario
         [System.Web.Http.HttpPost]
         public HttpResponseMessage PostPropietario([FromBody]Propietario item)
         {
-            if (!String.IsNullOrEmpty(item.nombre) && !String.IsNullOrEmpty(item.apellido))
+            if (!String.IsNullOrEmpty(item.Nombre) && !String.IsNullOrEmpty(item.Apellido))
             {
                 connection();
                 conn.Open();
                 string sqlText = "Insert into propietario values(@nombre,@apellido)";
                 com = new SqlCommand(sqlText, conn);
 
-                com.Parameters.AddWithValue("@nombre", item.nombre.ToUpper().Trim());
-                com.Parameters.AddWithValue("@apellido", item.apellido.ToUpper().Trim());
+                com.Parameters.AddWithValue("@nombre", item.Nombre.ToUpper().Trim());
+                com.Parameters.AddWithValue("@apellido", item.Apellido.ToUpper().Trim());
 
                 int i = com.ExecuteNonQuery();
                 conn.Close();
@@ -102,8 +80,8 @@ namespace ControlIT.Controllers
             conn.Open();
             string sqlText = $"update propietario set nombre=@nombre,apellido=@apellido where id={id}";
             com = new SqlCommand(sqlText, conn);
-            com.Parameters.AddWithValue("@nombre", item.nombre.ToUpper().Trim());
-            com.Parameters.AddWithValue("@apellido", item.apellido.ToUpper().Trim());
+            com.Parameters.AddWithValue("@nombre", item.Nombre.ToUpper().Trim());
+            com.Parameters.AddWithValue("@apellido", item.Apellido.ToUpper().Trim());
             int i = com.ExecuteNonQuery();
             conn.Close();
             var respuesta = Request.CreateResponse("Propietario actualizado");

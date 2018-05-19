@@ -9,10 +9,10 @@ namespace ControlIT.Models
     public class Propietario
     {
         [Key]
-        public int id { get; set; }
+        public int Id { get; set; }
         [Required]
-        public string nombre { get; set; }
+        public string Nombre { get; set; }
         [Required]
-        public string apellido { get; set; }
+        public string Apellido { get; set; }
     }
 }

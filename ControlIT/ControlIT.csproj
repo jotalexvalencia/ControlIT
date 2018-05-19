@@ -148,8 +148,9 @@
     <Compile Include="App_Start\WebApiConfig.cs" />
     <Compile Include="Controllers\HomeController.cs" />
     <Compile Include="Controllers\IVehicle.cs" />
-    <Compile Include="Controllers\PropietarioController.cs" />
+    <Compile Include="Controllers\PropietariosController.cs" />
     <Compile Include="Controllers\PropietarioSql.cs" />
+    <Compile Include="Models\Repositorio.cs" />
     <Compile Include="Controllers\VehiculoController.cs" />
     <Compile Include="Controllers\VehiculoMock.cs" />
     <Compile Include="Controllers\VehiculoSQL.cs" />

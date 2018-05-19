@@ -54,7 +54,7 @@
         function getPropietarioList() {
             // Call Web API to get a list of Propietarios
             $.ajax({
-                url: '/api/Propietario/',
+                url: '/api/Propietarios/',
                 type: 'GET',
                 dataType: 'json',
                 success: function (Propietario) {
@@ -280,7 +280,7 @@
         function getData() {
             $.ajax({
                 type: "GET",
-                url: '/api/Propietario/',
+                url: '/api/Propietarios/',
                 dataType: "json",
                 success: function (data) {
                     $.each(data, function (key, registro) {
