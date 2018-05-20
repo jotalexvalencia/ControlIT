@@ -156,6 +156,9 @@ namespace ControlIT.Controllers
         [System.Web.Http.HttpPut]
         public HttpResponseMessage PutVehiculo(int id, [FromBody]Vehiculo item)
         {
+            connection();
+            conn.Open();
+
             HttpResponseMessage respuesta = null;
 
             if (!String.IsNullOrEmpty(item.descripcion) && !String.IsNullOrEmpty(item.latitud.ToString()) &&
@@ -163,12 +166,7 @@ namespace ControlIT.Controllers
             {
                 int cantVehiculos;
 
-                connection();
-                //vehiculoSQL.setConexion(constr);
-                //conn = new SqlConnection(constr);
-                //conn.Open();
-
-                conn.Open();
+                
                 string sqlText = $"SELECT COUNT (vehiculos.propietario) as cantidad  FROM vehiculos " +
                     $"inner join propietario on vehiculos.propietario = propietario.id " +
                     $"where vehiculos.propietario = {item.propietario}";
@@ -232,17 +230,13 @@ namespace ControlIT.Controllers
         [System.Web.Http.HttpGet]
         public IHttpActionResult GetVehiculoPropietario(int id, [FromBody]Vehiculo item)
         {
+            connection();
+            conn.Open();
+
             IHttpActionResult ret = null;
 
             if (id > 0)
             {
-
-                connection();
-
-                //vehiculoSQL.setConexion(constr);
-                //conn = new SqlConnection(constr);
-                conn.Open();
-
                 var vehiculos = new List<Vehiculo>();
                 com = new SqlCommand($"select vehiculos.latitud, vehiculos.longitud, vehiculos.sitio " +
                    $"from vehiculos where propietario ={id} ", conn);
@@ -267,18 +261,14 @@ namespace ControlIT.Controllers
                     {
                         conn.Close();
                         ret = Ok(vehiculos);
-
-
                     }
                     else
                     {
+                        
                         conn.Close();
-                        ret = BadRequest("El usuario no posee vehículos aún");
+                        ret = BadRequest("El usuario no posee vehículos aún");                        
                     }
-
-
                     return ret;
-
                 }
             }
             else
@@ -288,7 +278,5 @@ namespace ControlIT.Controllers
                 return ret;
             }
         }
-
-
     }
 }

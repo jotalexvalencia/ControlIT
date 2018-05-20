@@ -161,6 +161,7 @@
             options.contentType = "application/json";
             options.dataType = "html";
             options.success = function (msg) {
+                getPropietarioList();
                 $("#msg").html(msg);
                 alert(msg);
             };
@@ -217,11 +218,12 @@
                 success: function (Vehiculo) {
 
                     VehiculoListSuccess(Vehiculo);
-
+                    
 
                 },
                 error: function (request, message, error) {
                     handleException(request, message, error);
+                    
                 }
             });
 
@@ -282,9 +284,11 @@
             var msg = "";
             msg += "Code: " + request.status + "\n";
             msg += "Text: " + request.statusText + "\n";
+            msg += "Aditional: " + request.message + "\n";
             if (request.responseJSON != null) {
                 msg += "Message" + request.responseJSON.Message + "\n";
             }
+           
 
             alert(msg);
         }

@@ -47,10 +47,12 @@ namespace ControlIT.Controllers
         [System.Web.Http.HttpPost]
         public HttpResponseMessage PostPropietario([FromBody]Propietario item)
         {
+            connection();
+            conn.Open();
             if (!String.IsNullOrEmpty(item.Nombre) && !String.IsNullOrEmpty(item.Apellido))
             {
-                connection();
-                conn.Open();
+                //connection();
+                //conn.Open();
                 string sqlText = "Insert into propietario values(@nombre,@apellido)";
                 com = new SqlCommand(sqlText, conn);
 
