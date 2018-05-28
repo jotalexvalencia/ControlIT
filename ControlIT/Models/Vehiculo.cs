@@ -8,16 +8,16 @@ namespace ControlIT.Models
 {
     public class Vehiculo
     {   [Key]
-        public int id { get; set; }
+        public int Id { get; set; }
         [Required]
-        public string descripcion { get; set; }
+        public string Descripcion { get; set; }
         [Required]
-        public float longitud { get; set; }
+        public double Longitud { get; set; }
         [Required]
-        public float latitud { get; set; }
+        public double Latitud { get; set; }
         [Required]
-        public int propietario { get; set; }
+        public int Propietario { get; set; }
         [Required]
-        public string sitio { get; set; }
+        public string Sitio { get; set; }
     }
 }

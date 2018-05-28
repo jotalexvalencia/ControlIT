@@ -14,5 +14,7 @@ namespace ControlIT.Models
         public string Nombre { get; set; }
         [Required]
         public string Apellido { get; set; }
+
+        public ICollection<Vehiculo> Vehiculos { get; set; } = new HashSet<Vehiculo>();
     }
 }

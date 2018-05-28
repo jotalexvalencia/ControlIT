@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Configuration;
 using System.Data.SqlClient;
+using System.Linq;
 using System.Net;
 using System.Net.Http;
 using System.Web.Http;
@@ -18,17 +19,10 @@ namespace ControlIT.Controllers
 
         private Repositorio repo;
 
-        public PropietariosController()
+        public PropietariosController(Repositorio repo)
         {
-            var constr = ConfigurationManager.ConnectionStrings["ad"];
-            if (constr != null)
-            {
-                repo = new Repositorio(constr.ConnectionString);
-            }
+            this.repo = repo ?? throw new ArgumentNullException(nameof(repo));
         }
-
-        //seam
-        internal Repositorio Repositorio { set { repo = value; } }
 
         private void connection()        {
             
@@ -43,109 +37,65 @@ namespace ControlIT.Controllers
             return Ok(propietarios);
         }
 
-        //POST: /api/Propietario
-        [System.Web.Http.HttpPost]
-        public HttpResponseMessage PostPropietario([FromBody]Propietario item)
+        //GET: api/Propietarios/5
+        public IHttpActionResult Get(int id)
         {
-            connection();
-            conn.Open();
-            if (!String.IsNullOrEmpty(item.Nombre) && !String.IsNullOrEmpty(item.Apellido))
+            var prop = repo.ObtenerPropietario(id);
+            if (prop == null)
             {
-                //connection();
-                //conn.Open();
-                string sqlText = "Insert into propietario values(@nombre,@apellido)";
-                com = new SqlCommand(sqlText, conn);
-
-                com.Parameters.AddWithValue("@nombre", item.Nombre.ToUpper().Trim());
-                com.Parameters.AddWithValue("@apellido", item.Apellido.ToUpper().Trim());
-
-                int i = com.ExecuteNonQuery();
-                conn.Close();
-                var response = Request.CreateResponse<Propietario>(HttpStatusCode.Created, item);
-                string uri = Url.Link("DefaultApi", new { item });
-                response.Headers.Location = new Uri(uri);
-                return response;
+                return NotFound();
             }
-            else
-            {
-                conn.Close();
-                var respuesta = Request.CreateResponse("Error");
-                return respuesta;
-            }
+            return Ok(prop);
         }
 
-        //PUT: /api/Propietario/id
-        [System.Web.Http.HttpPut]
-        public HttpResponseMessage Put(int id, [FromBody]Propietario item)
+        //POST: /api/Propietarios
+        public IHttpActionResult Post(Propietario prop)
         {
-            connection();
-            conn.Open();
-            string sqlText = $"update propietario set nombre=@nombre,apellido=@apellido where id={id}";
-            com = new SqlCommand(sqlText, conn);
-            com.Parameters.AddWithValue("@nombre", item.Nombre.ToUpper().Trim());
-            com.Parameters.AddWithValue("@apellido", item.Apellido.ToUpper().Trim());
-            int i = com.ExecuteNonQuery();
-            conn.Close();
-            var respuesta = Request.CreateResponse("Propietario actualizado");
-            return respuesta;
+            if(!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            repo.CrearPropietario(prop);
+
+            return CreatedAtRoute("DefaultApi", new { id = prop.Id }, prop); 
         }
 
-        //DELETE: /api/Propietario/id
-        [System.Web.Http.HttpDelete]
-        public HttpResponseMessage Delete(int id, [FromBody]Propietario item)
+        //PUT: /api/Propietarios/id
+        public IHttpActionResult Put(int id, Propietario prop)
         {
-            HttpResponseMessage respuesta = null;
+            if (id <= 0)
+                return BadRequest("El id no es válido.");
 
-            if (id > 0)
-            {
-                int cantVehiculos;
+            if (!ModelState.IsValid)
+                return BadRequest(ModelState);
 
-                connection();
-                conn.Open();
+            var dbProp = repo.ObtenerPropietario(id);
+            if (dbProp == null)
+                return NotFound();
+            
+            repo.ActualizarPropietario(prop);
 
-                string sqlText = $"SELECT COUNT (vehiculos.propietario) as cantidad  FROM vehiculos " +
-                    $"inner join propietario on vehiculos.propietario = propietario.id " +
-                    $"where vehiculos.propietario = {id}";
+            return Ok();
+        }
 
-                com = new SqlCommand(sqlText, conn);
+        //DELETE: /api/Propietarios/id
+        public IHttpActionResult Delete(int id)
+        {
+            if (id <= 0)
+                return BadRequest("El id no es válido.");
 
-                using (var registro = com.ExecuteReader())
-                {
-                    if (registro.Read())
-                    {
-                        cantVehiculos = int.Parse(registro["cantidad"].ToString());
+            var prop = repo.ObtenerPropietario(id);
 
-                        if (cantVehiculos < 1)
-                        {
-                            registro.Close();
-                            string sqlText1 = $"delete from propietario where id={id}";
-                            com = new SqlCommand(sqlText1, conn);
-                            int i = com.ExecuteNonQuery();
-                            conn.Close();
-                            respuesta = Request.CreateResponse("Propietario eliminado");
-                            return respuesta;
-                        }
-                        else
-                        {
-                            conn.Close();
-                            respuesta = Request.CreateResponse($"El propietario posee {cantVehiculos} vehículo(s)");
-                            return respuesta;
-                        }
-                    }
-                    else
-                    {
-                        conn.Close();
-                        respuesta = Request.CreateResponse("Error");
-                        return respuesta;
-                    }
-                }
-            }
-            else
-            {
-                conn.Close();
-                respuesta = Request.CreateResponse("Propietario no existe");
-                return respuesta;
-            }
+            if (prop == null)
+                return NotFound();
+
+            if (prop.Vehiculos.Any())
+                return Conflict();
+
+            repo.EliminarPropietario(id);
+
+            return Ok();
         }
     }
 }

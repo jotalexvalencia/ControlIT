@@ -164,3 +164,7 @@ C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\obj\Debug\ControlIT.cs
 C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\obj\Debug\ControlIT.csproj.CopyComplete
 C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\obj\Debug\ControlIT.dll
 C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\obj\Debug\ControlIT.pdb
+C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\bin\Autofac.dll
+C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\bin\Autofac.Integration.WebApi.dll
+C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\bin\Autofac.xml
+C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\bin\Autofac.Integration.WebApi.xml

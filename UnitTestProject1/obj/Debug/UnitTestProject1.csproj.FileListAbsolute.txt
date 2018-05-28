@@ -36,3 +36,8 @@ C:\Users\jorge\source\repos\ControlIT\ControlIT\UnitTestProject1\obj\Debug\UnitT
 C:\Users\jorge\source\repos\ControlIT\ControlIT\UnitTestProject1\obj\Debug\UnitTestProject1.csproj.CopyComplete
 C:\Users\jorge\source\repos\ControlIT\ControlIT\UnitTestProject1\obj\Debug\UnitTestProject1.dll
 C:\Users\jorge\source\repos\ControlIT\ControlIT\UnitTestProject1\obj\Debug\UnitTestProject1.pdb
+C:\Users\jorge\source\repos\ControlIT\ControlIT\UnitTestProject1\bin\Debug\UnitTestProject1.dll.config
+C:\Users\jorge\source\repos\ControlIT\ControlIT\UnitTestProject1\bin\Debug\Autofac.dll
+C:\Users\jorge\source\repos\ControlIT\ControlIT\UnitTestProject1\bin\Debug\Autofac.Integration.WebApi.dll
+C:\Users\jorge\source\repos\ControlIT\ControlIT\UnitTestProject1\bin\Debug\Autofac.xml
+C:\Users\jorge\source\repos\ControlIT\ControlIT\UnitTestProject1\bin\Debug\Autofac.Integration.WebApi.xml

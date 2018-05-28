@@ -83,7 +83,8 @@
                 "<td><input  class='input-apellido input-sm'  type='text' value='" + Propietario.apellido + "'/></td>" +
                 "<td>" +
                 "<button type='button' " +
-                "onclick='CleanRows();getVehiculo(this);initialize();'" +
+                "onclick='getVehiculo(this);'" +
+                //"onclick='CleanRows();getVehiculo(this);initialize();'" +
                 "class='btn btn-primary btn-xs' " +
                 "data-id='" + Propietario.id + "' " +
                 ">" +
@@ -98,8 +99,7 @@
                 ">" +
                 "<span class='glyphicon glyphicon-edit' /> Update" +
                 "</button> " +
-                " <button type='button' " +
-                //"onclick='javascript:return asegurar(PropietarioDelete(this));'" +
+                " <button type='button' " +                
                 "onclick='PropietarioDelete(this);'" +
                 "class='btn btn-primary btn-xs' " +
                 "data-id='" + Propietario.id + "'>" +
@@ -148,12 +148,11 @@
             var id = $(item).data("id");
             var options = {};
             //options.url = "/api/Propietario/" + $(item).data("id");
-            options.url = "/api/Propietarios/"
-                + id;
+            options.url = "/api/Propietarios/" + id;
             options.type = "PUT";
 
             var obj = Propietario;
-            obj.id = $(item).data("id");
+            obj.id = id;
             obj.nombre = $(".input-nombre", $(item).parent().parent()).val();
             obj.apellido = $(".input-apellido", $(item).parent().parent()).val();
             console.dir(obj);
@@ -165,41 +164,35 @@
                 $("#msg").html(msg);
                 alert(msg);
             };
-            options.error = function () {
-                $("#msg").html("Error while calling the Web API!");
-            };
+            options.error = handleException;
+
             $.ajax(options);
         }
 
         function PropietarioDelete(item) {
             var confirma = asegurar();
-
-            var id = $(item).data("id");
-            var options = {};
             if (confirma == true) {
-                options.url = "/api/Propietarios/"
-                    + id;
+                var id = $(item).data("id");
+                var options = {};
+                options.url = "/api/Propietarios/" + id;
                 options.type = "DELETE";
-                options.dataType = "html";
+                options.success = function () {
+                    var msg = "El propietario se elimino correctamente.";
 
-
-                options.success = function (msg) {
-
-                    console.log('msg= ' + msg);
                     $("#msg").html(msg);
 
                     alert(msg);
                     getPropietarioList();
-
                 };
+                options.error = function (xhr) {
+                    if (xhr.status === 409) {
+                        alert("El propietario tiene vehiculos asignados");
+                    } else {
+                        handleException(xhr);
+                    }
+                };
+                $.ajax(options);
             }
-
-
-            options.error = function () {
-                $("#msg").html("Error while calling the Web API!");
-            };
-            $.ajax(options);
-
         }
 
         function asegurar() {
@@ -216,15 +209,14 @@
                 type: 'GET',
                 dataType: 'json',
                 success: function (Vehiculo) {
-
+                   
+                    CleanRows();
                     VehiculoListSuccess(Vehiculo);
+                    initialize();
                     
 
                 },
-                error: function (request, message, error) {
-                    handleException(request, message, error);
-                    
-                }
+                error: handleException
             });
 
         }
@@ -276,23 +268,59 @@
         function CleanRows() {
 
             $('#VehiculoTable tbody tr').remove();
-
+            
         }
 
         // Handle exceptions from AJAX calls
         function handleException(request, message, error) {
             var msg = "";
-            msg += "Code: " + request.status + "\n";
-            msg += "Text: " + request.statusText + "\n";
-            msg += "Aditional: " + request.message + "\n";
-            if (request.responseJSON != null) {
-                msg += "Message" + request.responseJSON.Message + "\n";
+            //Esto es muy tecnico no conviene mostrarselo al usuario
+            //msg += "Code: " + request.status + "\n";           
+            //msg += "Text: " + request.statusText + "\n";
+
+            switch (request.status) {
+                case 404:
+                    //NotFound
+                    msg += "No se encuentra el recurso";
+                    break;
+                case 400:
+                    //BadRequest
+                    msg += parseErrorResponse(request.responseText);
+                    break;
+                default:
+                    console.log(request);
+                    msg += "Ha ocurrido un error, vualva a intentarlo mas tarde.";
             }
-           
 
             alert(msg);
         }
 
+        function parseErrorResponse(responseText) {
+            var resp,
+                msg = "La solicitud es inválida \n";
+
+            try {
+                resp = JSON.parse(responseText);
+            } catch {
+                //Ignorado
+            }
+
+            if (resp) {
+                if (resp.modelState) {
+                    for (var prop in resp.modelState) {
+                        resp.modelState[prop].forEach(function (error) {
+                            msg += error + "\n";
+                        });
+                    }
+                } else {
+                    msg += resp.message;
+                }
+               return msg;
+            } else {
+                msg += responseText;
+                return msg;
+            }
+        }
 
 
     </script>

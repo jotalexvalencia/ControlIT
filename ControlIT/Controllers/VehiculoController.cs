@@ -35,8 +35,8 @@ namespace ControlIT.Controllers
             //conn = new SqlConnection(constr);
             HttpResponseMessage respuesta = null;
 
-            if (item.descripcion != string.Empty && item.longitud != 0 && item.latitud != 0
-                && item.propietario > 0 && item.sitio != string.Empty)
+            if (item.Descripcion != string.Empty && item.Longitud != 0 && item.Latitud != 0
+                && item.Propietario > 0 && item.Sitio != string.Empty)
             {
                 int cantVehiculos;
 
@@ -45,7 +45,7 @@ namespace ControlIT.Controllers
 
                 string sqlText = $"SELECT COUNT (vehiculos.propietario) as cantidad  FROM vehiculos " +
                     $"inner join propietario on vehiculos.propietario = propietario.id " +
-                    $"where vehiculos.propietario = {item.propietario}";
+                    $"where vehiculos.propietario = {item.Propietario}";
 
                 com = new SqlCommand(sqlText, conn);
 
@@ -61,15 +61,15 @@ namespace ControlIT.Controllers
                             string sqlText1 = "Insert into vehiculos values(@descripcion,@longitud,@latitud,@propietario,@sitio)";
                             com = new SqlCommand(sqlText1, conn);
 
-                            com.Parameters.AddWithValue("@descripcion", item.descripcion);
-                            com.Parameters.AddWithValue("@longitud", item.longitud);
-                            com.Parameters.AddWithValue("@latitud", item.latitud);
-                            com.Parameters.AddWithValue("@propietario", item.propietario);
-                            com.Parameters.AddWithValue("@sitio", item.sitio);
+                            com.Parameters.AddWithValue("@descripcion", item.Descripcion);
+                            com.Parameters.AddWithValue("@longitud", item.Longitud);
+                            com.Parameters.AddWithValue("@latitud", item.Latitud);
+                            com.Parameters.AddWithValue("@propietario", item.Propietario);
+                            com.Parameters.AddWithValue("@sitio", item.Sitio);
                             int i = com.ExecuteNonQuery();
                             conn.Close();
                             var response = Request.CreateResponse<Vehiculo>(HttpStatusCode.Created, item);
-                            string uri = Url.Link("DefaultApi", new { id = item.id });
+                            string uri = Url.Link("DefaultApi", new { id = item.Id });
                             response.Headers.Location = new Uri(uri);
                             respuesta = Request.CreateResponse("Vehiculo ingresado con éxito");
                             return respuesta;
@@ -161,15 +161,15 @@ namespace ControlIT.Controllers
 
             HttpResponseMessage respuesta = null;
 
-            if (!String.IsNullOrEmpty(item.descripcion) && !String.IsNullOrEmpty(item.latitud.ToString()) &&
-                !String.IsNullOrEmpty(item.longitud.ToString()) && !String.IsNullOrEmpty(item.propietario.ToString()) && id > 0)
+            if (!String.IsNullOrEmpty(item.Descripcion) && !String.IsNullOrEmpty(item.Latitud.ToString()) &&
+                !String.IsNullOrEmpty(item.Longitud.ToString()) && !String.IsNullOrEmpty(item.Propietario.ToString()) && id > 0)
             {
                 int cantVehiculos;
 
                 
                 string sqlText = $"SELECT COUNT (vehiculos.propietario) as cantidad  FROM vehiculos " +
                     $"inner join propietario on vehiculos.propietario = propietario.id " +
-                    $"where vehiculos.propietario = {item.propietario}";
+                    $"where vehiculos.propietario = {item.Propietario}";
 
                 com = new SqlCommand(sqlText, conn);
 
@@ -189,16 +189,16 @@ namespace ControlIT.Controllers
                                 $"propietario=@propietario where id={id}";
                             com = new SqlCommand(sqlText1, conn);
 
-                            com.Parameters.AddWithValue("@descripcion", item.descripcion);
-                            com.Parameters.AddWithValue("@latitud", item.latitud);
-                            com.Parameters.AddWithValue("@longitud", item.longitud);
-                            com.Parameters.AddWithValue("@propietario", item.propietario);
-                            com.Parameters.AddWithValue("@sitio", item.sitio);
+                            com.Parameters.AddWithValue("@descripcion", item.Descripcion);
+                            com.Parameters.AddWithValue("@latitud", item.Latitud);
+                            com.Parameters.AddWithValue("@longitud", item.Longitud);
+                            com.Parameters.AddWithValue("@propietario", item.Propietario);
+                            com.Parameters.AddWithValue("@sitio", item.Sitio);
 
                             int i = com.ExecuteNonQuery();
                             conn.Close();
                             var response = Request.CreateResponse<Vehiculo>(HttpStatusCode.Created, item);
-                            string uri = Url.Link("DefaultApi", new { id = item.id });
+                            string uri = Url.Link("DefaultApi", new { id = item.Id });
                             response.Headers.Location = new Uri(uri);
                             respuesta = Request.CreateResponse("Vehiculo Actualizado con éxito");
                             return respuesta;
@@ -230,13 +230,14 @@ namespace ControlIT.Controllers
         [System.Web.Http.HttpGet]
         public IHttpActionResult GetVehiculoPropietario(int id, [FromBody]Vehiculo item)
         {
-            connection();
-            conn.Open();
-
             IHttpActionResult ret = null;
 
             if (id > 0)
             {
+
+                connection();
+                conn.Open();
+
                 var vehiculos = new List<Vehiculo>();
                 com = new SqlCommand($"select vehiculos.latitud, vehiculos.longitud, vehiculos.sitio " +
                    $"from vehiculos where propietario ={id} ", conn);
@@ -248,9 +249,9 @@ namespace ControlIT.Controllers
                         // Usuario
                         var vehiculo = new Vehiculo
                         {
-                            latitud = (float)Convert.ToDouble(registro["latitud"]),
-                            longitud = (float)Convert.ToDouble(registro["longitud"]),
-                            sitio = registro["sitio"].ToString()
+                            Latitud = (float)Convert.ToDouble(registro["latitud"]),
+                            Longitud = (float)Convert.ToDouble(registro["longitud"]),
+                            Sitio = registro["sitio"].ToString()
                         };
 
                         // Agregamos el usuario a la lista 
@@ -261,20 +262,24 @@ namespace ControlIT.Controllers
                     {
                         conn.Close();
                         ret = Ok(vehiculos);
+
+
                     }
                     else
                     {
-                        
                         conn.Close();
-                        ret = BadRequest("El usuario no posee vehículos aún");                        
+                        ret = NotFound();
                     }
+
+
                     return ret;
+
                 }
             }
             else
             {
                 conn.Close();
-                ret = BadRequest("El usuario no existe");
+                ret = NotFound();
                 return ret;
             }
         }
