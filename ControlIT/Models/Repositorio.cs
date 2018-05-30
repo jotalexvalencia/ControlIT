@@ -15,16 +15,25 @@ namespace ControlIT.Models
 
         public virtual IEnumerable<Propietario> ObtenerPropietarios()
         {
-            using(var conn = new SqlConnection(connString))
+            using (var conn = new SqlConnection(connString))
+            using (var cmd = new SqlCommand(PropietarioSelect, conn))
             {
-                var cmd = new SqlCommand(PropietarioSelect, conn);
                 conn.Open();
-                using(var reader = cmd.ExecuteReader())
-                { 
+                using (var reader = cmd.ExecuteReader())
+                {
                     var result = new List<Propietario>();
-                    while(reader.Read())
+                    Propietario prop = null;
+                    int idAnterior = 0;
+                    while (reader.Read())
                     {
-                        result.Add(MapPropietario(reader));
+                        int id = reader.GetInt32(0);
+                        if (id != idAnterior)
+                        {
+                            idAnterior = id;
+                            prop = MapPropietario(id, reader);
+                            result.Add(prop);
+                        }
+                        CargarVehiculo(prop, reader);
                     }
                     return result;
                 }
@@ -34,64 +43,51 @@ namespace ControlIT.Models
         public virtual Propietario ObtenerPropietario(int id)
         {
             using (var conn = new SqlConnection(connString))
+            using (var cmd = new SqlCommand(PropietarioSelect + " WHERE p.Id = @Id", conn))
             {
-                var sql = PropietarioSelect + " WHERE Id = @Id";
-                var cmd = new SqlCommand(sql, conn);
                 cmd.Parameters.AddWithValue("@Id", id);
                 conn.Open();
                 using (var reader = cmd.ExecuteReader())
                 {
-                    if (reader.Read())
+                    Propietario prop = null;
+                    while(reader.Read())
                     {
-                        return MapPropietario(reader);
+                        if (prop == null)
+                        {
+                            prop = MapPropietario(id, reader); 
+                        }
+                        CargarVehiculo(prop, reader);
                     }
+                    return prop;
                 }
-                return null;
             }
         }
 
-        private Propietario MapPropietario(SqlDataReader reader)
+        private Propietario MapPropietario(int id, SqlDataReader reader)
         {
-            var prop = new Propietario
+            return new Propietario
             {
-                Id = reader.GetInt32(0),
+                Id = id,
                 Nombre = reader.GetString(1),
                 Apellido = reader.GetString(2)
             };
-            CargarVehiculos(prop);
-            return prop;
-        }
-
-        private void CargarVehiculos(Propietario prop)
-        {
-            using(var conn = new SqlConnection(connString))
-            {
-                var query = VehiculosSelect + " WHERE Propietario = @PropId";
-                var cmd = new SqlCommand(query, conn);
-                cmd.Parameters.AddWithValue("@PropId", prop.Id);
-                conn.Open();
-                using(var reader = cmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        CargarVehiculo(prop, reader);
-                    }
-                }
-            }
         }
 
         private static void CargarVehiculo(Propietario prop, SqlDataReader reader)
         {
-            var vh = new Vehiculo
+            bool tieneVehiculo = !reader.IsDBNull(3);
+            if (tieneVehiculo)
             {
-                Id = reader.GetInt32(0),
-                Descripcion = reader.GetString(1),
-                Latitud = reader.GetDouble(2),
-                Longitud = reader.GetDouble(3),
-                Sitio = reader.GetString(4),
-                Propietario = reader.GetInt32(5)    
-            };
-            prop.Vehiculos.Add(vh);
+                prop.Vehiculos.Add(new Vehiculo
+                {
+                    Id = reader.GetInt32(3),
+                    Descripcion = reader.GetString(4),
+                    Latitud = reader.GetDouble(5),
+                    Longitud = reader.GetDouble(6),
+                    Sitio = reader.GetString(7),
+                    Propietario = prop.Id
+                });
+            }
         }
 
         public virtual void EliminarPropietario(int id)
@@ -108,7 +104,7 @@ namespace ControlIT.Models
 
         public virtual void CrearPropietario(Propietario prop)
         {
-            using(var conn = new SqlConnection(connString))
+            using (var conn = new SqlConnection(connString))
             {
                 var query = "INSERT INTO propietario values(@nombre, @apellido);"
                     + "SELECT SCOPE_IDENTITY()";
@@ -134,12 +130,13 @@ namespace ControlIT.Models
                 cmd.Parameters.AddWithValue("@nombre", prop.Nombre.ToUpper().Trim());
                 cmd.Parameters.AddWithValue("@apellido", prop.Apellido.ToUpper().Trim());
                 conn.Open();
-                cmd.ExecuteNonQuery(); 
+                cmd.ExecuteNonQuery();
             }
         }
 
-        private static string PropietarioSelect => "SELECT Id, Nombre, Apellido FROM Propietario";
-
-        private static string VehiculosSelect => "SELECT Id, Descripcion, Latitud, Longitud, Sitio, Propietario FROM Vehiculos";
+        private static string PropietarioSelect =>
+            "SELECT p.Id, p.Nombre, p.Apellido, v.Id as VehiculoId, " +
+            "v.Descripcion, v.Latitud, v.Longitud, v.Sitio " +
+            "FROM Propietario p LEFT JOIN Vehiculos v ON p.Id = v.Propietario";
     }
 }

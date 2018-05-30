@@ -36,6 +36,7 @@
         }
         var i = 0;
         var marcadores = [];
+        var propietarios = [];
 
         // Get all Propietarios to display
         function getPropietarioList() {
@@ -44,9 +45,9 @@
                 url: '/api/Propietarios/',
                 type: 'GET',
                 dataType: 'json',
-                success: function (Propietarios) {
-                    PropietarioListSuccess(Propietarios);
-
+                success: function (props) {
+                    propietarios = props;
+                    PropietarioListSuccess(props);
                 },
                 error: function (request, message, error) {
                     handleException(request, message, error);
@@ -99,7 +100,7 @@
                 ">" +
                 "<span class='glyphicon glyphicon-edit' /> Update" +
                 "</button> " +
-                " <button type='button' " +                
+                " <button type='button' " +
                 "onclick='PropietarioDelete(this);'" +
                 "class='btn btn-primary btn-xs' " +
                 "data-id='" + Propietario.id + "'>" +
@@ -204,30 +205,39 @@
         function getVehiculo(item) {
 
             var id = $(item).data("id");
-            $.ajax({
-                url: '/api/Vehiculo/' + id,
-                type: 'GET',
-                dataType: 'json',
-                success: function (Vehiculo) {
-                   
-                    CleanRows();
-                    VehiculoListSuccess(Vehiculo);
-                    initialize();
-                    
 
-                },
-                error: handleException
-            });
+            var prop = propietarios.find(p => p.id === id);
+
+            if (prop) {
+                CleanRows();
+                VehiculoListSuccess(prop.vehiculos);
+                initialize();
+            }
+
+            //$.ajax({
+            //    url: '/api/Vehiculo/' + id,
+            //    type: 'GET',
+            //    dataType: 'json',
+            //    success: function (Vehiculo) {
+
+            //        CleanRows();
+            //        VehiculoListSuccess(Vehiculo);
+            //        initialize();
+
+
+            //    },
+            //    error: handleException
+            //});
 
         }
 
         // Display all Vehiculos returned from Web API call
-        function VehiculoListSuccess(Vehiculo) {
+        function VehiculoListSuccess(vehiculos) {
             // Iterate over the collection of data
             $("#VehiculosTable tbody").remove();
-            $.each(Vehiculo, function (index, Vehiculo) {
+            $.each(vehiculos, function (index, vehiculo) {
                 // Add a row to the Propietario table
-                VehiculoAddRow(Vehiculo);
+                VehiculoAddRow(vehiculo);
 
             });
         }
@@ -268,14 +278,14 @@
         function CleanRows() {
 
             $('#VehiculoTable tbody tr').remove();
-            
+
         }
 
         // Handle exceptions from AJAX calls
         function handleException(request, message, error) {
             var msg = "";
             //Esto es muy tecnico no conviene mostrarselo al usuario
-            //msg += "Code: " + request.status + "\n";           
+            //msg += "Code: " + request.status + "\n";
             //msg += "Text: " + request.statusText + "\n";
 
             switch (request.status) {
@@ -315,7 +325,7 @@
                 } else {
                     msg += resp.message;
                 }
-               return msg;
+                return msg;
             } else {
                 msg += responseText;
                 return msg;
