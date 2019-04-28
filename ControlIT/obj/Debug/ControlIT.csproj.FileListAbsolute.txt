@@ -157,7 +157,6 @@ C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\bin\System.Web.WebPage
 C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\bin\System.Web.WebPages.Razor.xml
 C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\bin\Newtonsoft.Json.xml
 C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\bin\System.Web.Http.WebHost.xml
-C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\obj\Debug\ControlIT.csprojResolveAssemblyReference.cache
 C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\obj\Debug\ControlIT.images.resources
 C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\obj\Debug\ControlIT.csproj.GenerateResource.cache
 C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\obj\Debug\ControlIT.csproj.CoreCompileInputs.cache
@@ -168,3 +167,4 @@ C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\bin\Autofac.dll
 C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\bin\Autofac.Integration.WebApi.dll
 C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\bin\Autofac.xml
 C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\bin\Autofac.Integration.WebApi.xml
+C:\Users\jorge\source\repos\ControlIT\ControlIT\ControlIT\obj\Debug\ControlIT.csprojAssemblyReference.cache

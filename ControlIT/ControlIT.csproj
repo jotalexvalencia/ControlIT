@@ -114,6 +114,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Content Include="bdscript\script.sql" />
     <Content Include="css\jquery.gmaps.css" />
     <Content Include="js\jquery.gmaps.js" />
     <Content Include="Resources\car.png" />
